@@ -50,7 +50,6 @@ public class Collection implements Printable {
 
 
         for (String imageName : imageNames) {
-            System.out.println("image: " + imageName);
             images.put(imageName.toLowerCase().substring(0, imageName.indexOf(".")), new File(dir, imageName));
         }
         for (String description : textNames) {
@@ -63,8 +62,8 @@ public class Collection implements Printable {
             imageKeys.removeAll(descriptions.keySet());
             descriptionKeys.removeAll(images.keySet());
 
-            System.out.println("Images Missing Descriptions: " + imageKeys);
-            System.out.println("Descriptions Missing Images: " + descriptionKeys);
+            System.err.println("Images Missing Descriptions: " + imageKeys);
+            System.err.println("Descriptions Missing Images: " + descriptionKeys);
             throw new IllegalArgumentException("Missing Companion Data: " + imageKeys + " " + descriptionKeys);
         }
 
@@ -94,8 +93,6 @@ public class Collection implements Printable {
 
     @Override
     public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
-        System.out.println("PageIndex: " + pageIndex);
-
         if ((pageIndex / 2) >= pages.size()) {
             return NO_SUCH_PAGE;
         }

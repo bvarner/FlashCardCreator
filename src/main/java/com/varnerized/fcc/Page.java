@@ -2,7 +2,9 @@ package com.varnerized.fcc;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.awt.print.PageFormat;
 import java.io.IOException;
@@ -34,7 +36,6 @@ public class Page {
 
     public void addCard(Card card) {
         cards.add(card);
-        System.out.println(card.title);
     }
 
     public List<Card> getCards() {
@@ -45,6 +46,7 @@ public class Page {
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         g2d.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
+        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 
         g2d.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
 
@@ -74,7 +76,11 @@ public class Page {
             Card card = cards.get(i);
 
             if (s == Side.FRONT) {
-                BufferedImage image = ImageIO.read(card.image);
+                BufferedImage ogImage = ImageIO.read(card.image);
+                BufferedImage image = new BufferedImage(ogImage.getWidth(), ogImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
+                Graphics2D imageG2d = (Graphics2D) image.getGraphics();
+                imageG2d.drawImage(ogImage, 0, 0, null);
+
                 double imageAspectRatio = (double) image.getWidth() / (double) image.getHeight();
                 double targetAspectRation = (double) cardBoundaries[i].width / (double) cardBoundaries[i].height;
 
@@ -105,13 +111,17 @@ public class Page {
                 // Set the clipping region
                 g2d.setClip(clippedRect);
 
-                g2d.drawImage(image, xOffset, yOffset, iWidth, iHeight, null);
-
                 Rectangle2D titleRect = g2d.getFontMetrics().getStringBounds(card.title, g2d);
 
+                // Composite the Alpha Blend to make the title legible into the image.
+                imageG2d.scale(g2d.getTransform().getScaleX(), g2d.getTransform().getScaleY());
+                imageG2d.setColor(new Color(255, 255, 255, 156));
+                imageG2d.fillRect(0, cardBoundaries[i].height - titleRect.getBounds().height * 2, cardBoundaries[i].width, titleRect.getBounds().height * 2);
+                imageG2d.dispose();
+
+                g2d.drawImage(image, xOffset, yOffset, iWidth, iHeight, null);
+
                 g2d.setColor(new Color(255, 255, 255, 156));
-                g2d.fill(new Rectangle2D.Double(cardBoundaries[i].x, cardBoundaries[i].y + cardBoundaries[i].height - titleRect.getHeight() * 1.5,
-                        cardBoundaries[i].x + cardBoundaries[i].width, titleRect.getHeight() * 2));
                 g2d.setColor(Color.BLACK);
 
                 g2d.setFont(g2d.getFont().deriveFont(Font.BOLD));
