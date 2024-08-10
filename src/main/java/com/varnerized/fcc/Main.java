@@ -6,9 +6,7 @@ import javax.print.attribute.standard.Destination;
 import javax.print.attribute.standard.MediaPrintableArea;
 import javax.print.attribute.standard.MediaSizeName;
 import javax.print.attribute.standard.OrientationRequested;
-import javax.print.attribute.standard.PageRanges;
 import javax.print.attribute.standard.PrintQuality;
-import javax.print.attribute.standard.PrinterResolution;
 import javax.print.attribute.standard.Sides;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
@@ -35,7 +33,6 @@ public class Main {
 
         // Define the print attributes
         PrintRequestAttributeSet attributes = new HashPrintRequestAttributeSet();
-//        attributes.add(new PageRanges(1, 2));
         attributes.add(new Destination(new File("trading_cards.ps").toURI()));
         attributes.add(MediaSizeName.NA_LETTER);
         attributes.add(PrintQuality.HIGH);
