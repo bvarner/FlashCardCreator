@@ -129,7 +129,14 @@ public class Page {
                         cardBoundaries[i].y + cardBoundaries[i].height - ((int)titleRect.getHeight() / 2));
                 g2d.setFont(g2d.getFont().deriveFont(Font.PLAIN));
             } else {
-                renderText(g2d, cardBoundaries[i], card.text);
+                // We need to swap the card boundaries. So that 0 or an odd number is in the +1 position, and odd numbers are in the -1 position.
+                // This way we can print duplex on the long side and have everything come out right.
+                if (i % 2 == 0) {
+                    renderText(g2d, cardBoundaries[i+1], card.text);
+                } else {
+                    renderText(g2d, cardBoundaries[i-1], card.text);
+                }
+//                g2d.drawRect(cardBoundaries[i].x, cardBoundaries[i].y, cardBoundaries[i].width, cardBoundaries[i].height);
             }
         }
     }
@@ -149,13 +156,13 @@ public class Page {
 
         // Calculate ascent and insetting
         int ascent = fontMetrics.getAscent();
-        int inset = ascent / 2;
+        int inset = (ascent / 2) + ascent * 3;
 
         // Adjust the bounding box by insetting
         Rectangle adjustedBox = new Rectangle(
-                boundingBox.x + inset,
+                boundingBox.x + (ascent / 2),
                 boundingBox.y + inset,
-                boundingBox.width - 2 * inset,
+                boundingBox.width - 2 * (ascent / 2),
                 boundingBox.height - 2 * inset
         );
 

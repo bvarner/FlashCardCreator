@@ -70,7 +70,7 @@ public class Collection implements Printable {
         for (Map.Entry<String, File> entry : images.entrySet()) {
             try {
                 cards.add(new Card(entry.getKey(), entry.getValue(), Files.readString(descriptions.get(entry.getKey()).toPath())));
-            } catch (IOException e) {
+            } catch (IOException | NullPointerException e) {
                 throw new IllegalArgumentException("Could not read text file: " + descriptions.get(entry.getKey()), e);
             }
         }
